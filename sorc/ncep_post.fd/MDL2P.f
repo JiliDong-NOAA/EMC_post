@@ -65,7 +65,7 @@
                          ZGDRAG, CNVCTVMMIXING, VDIFFMACCE, MGDRAG,            &
                          CNVCTUMMIXING, NCNVCTCFRAC, CNVCTUMFLX, CNVCTDETMFLX, &
                          CNVCTZGDRAG, CNVCTMGDRAG, ZMID, ZINT, PMIDV,          &
-                         CNVCTDMFLX
+                         CNVCTDMFLX,TDCMOM
       use vrbls2d, only: T500, W_UP_MAX, W_DN_MAX, W_MEAN, PSLP, FIS, Z1000
       use masks,   only: LMH, SM
       use physcons_post,only: CON_FVIRT, CON_ROG, CON_EPS, CON_EPSM1
@@ -120,7 +120,7 @@
 !  DBZ1  - radar reflectivity
 !
       REAL, dimension(im,jsta_2l:jend_2u) :: C1D, QW1, QI1, QR1, QS1, QG1, DBZ1 &
-      ,                                      FRIME, RAD, HAINES
+      ,                                      FRIME, RAD, HAINES,TDCMOM1    
 
       REAL SDUMMY(IM,2)
 
@@ -195,6 +195,7 @@
          (IGET(153) > 0) .OR. (IGET(166) > 0) .OR.      &
          (IGET(183) > 0) .OR. (IGET(184) > 0) .OR.      &
          (IGET(198) > 0) .OR. (IGET(251) > 0) .OR.      &
+         (IGET(969) > 0)                      .OR.      &
          (IGET(257) > 0) .OR. (IGET(258) > 0) .OR.      &
          (IGET(294) > 0) .OR. (IGET(268) > 0) .OR.      &
          (IGET(331) > 0) .OR. (IGET(326) > 0) .OR.      &
@@ -260,6 +261,7 @@
               QS1(I,J)      = SPVAL      ! Snow (precip ice) 
               QG1(I,J)      = SPVAL      ! Graupel
               DBZ1(I,J)     = SPVAL
+              TDCMOM1(I,J)  = SPVAL
               FRIME(I,J)    = SPVAL
               RAD(I,J)      = SPVAL
               O3SL(I,J)     = SPVAL
@@ -349,6 +351,8 @@
                  QG1(I,J) = MAX(QG1(I,J),zero)              ! Graupel (precip ice) 
                  IF(DBZ(I,J,1)     < SPVAL) DBZ1(I,J)  = DBZ(I,J,1)
                  DBZ1(I,J) = MAX(DBZ1(I,J),DBZmin)
+                 IF(TDCMOM(I,J,1)     < SPVAL) TDCMOM1(I,J)  = TDCMOM(I,J,1)
+                 TDCMOM1(I,J) = MAX(TDCMOM1(I,J),zero)
                  IF(F_RimeF(I,J,1) < SPVAL) FRIME(I,J) = F_RimeF(I,J,1)
                  FRIME(I,J) = MAX(FRIME(I,J),H1)
                  IF(TTND(I,J,1)    < SPVAL) RAD(I,J)   = TTND(I,J,1)
@@ -503,6 +507,10 @@
                  IF(DBZ(I,J,LL) < SPVAL .AND. DBZ(I,J,LL-1) < SPVAL)         &
                    DBZ1(I,J) = DBZ(I,J,LL) + (DBZ(I,J,LL)-DBZ(I,J,LL-1))*FACT
                    DBZ1(I,J) = MAX(DBZ1(I,J),DBZmin)
+
+                 IF(TDCMOM(I,J,LL) < SPVAL .AND. TDCMOM(I,J,LL-1) < SPVAL)         &
+                   TDCMOM1(I,J) = TDCMOM(I,J,LL) + (TDCMOM(I,J,LL)-TDCMOM(I,J,LL-1))*FACT  
+                   TDCMOM1(I,J) = MAX(TDCMOM1(I,J),zero)
 
                  IF(F_RimeF(I,J,LL) < SPVAL .AND. F_RimeF(I,J,LL-1) < SPVAL) &
                    FRIME(I,J) = F_RimeF(I,J,LL) + (F_RimeF(I,J,LL) - F_RimeF(I,J,LL-1))*FACT
@@ -732,6 +740,7 @@
                  QS1(I,J)   = 0.
                  QG1(I,J)   = 0.
                  DBZ1(I,J)  = DBZmin
+                 TDCMOM1(I,J)  = 0. 
                  FRIME(I,J) = 1.
                  RAD(I,J)   = 0.
                  O3SL(I,J)  = O3(I,J,LLMH)
@@ -1968,6 +1977,32 @@
              endif
           ENDIF
          ENDIF
+
+! dong add eddy diffusivity
+
+!---  Eddy diffusivity for momentum  
+         IF (IGET(969) > 0) THEN
+          IF (LVLS(LP,IGET(969)) > 0) THEN
+!$omp  parallel do private(i,j)
+            DO J=JSTA,JEND
+              DO I=1,IM
+                GRID1(I,J) = TDCMOM1(I,J)
+              ENDDO
+            ENDDO
+               cfld = cfld + 1
+               fld_info(cfld)%ifld=IAVBLFLD(IGET(969))
+               fld_info(cfld)%lvl=LVLSXML(LP,IGET(969))
+!$omp parallel do private(i,j,jj)
+               do j=1,jend-jsta+1
+                 jj = jsta+j-1
+                 do i=1,im
+                   datapd(i,j,cfld) = GRID1(i,jj)
+                 enddo
+               enddo
+          ENDIF
+         ENDIF
+
+
 !
 !---  IN-FLIGHT ICING CONDITION: ADD BY B. ZHOU
         IF(IGET(257) > 0)THEN

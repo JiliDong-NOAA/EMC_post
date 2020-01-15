@@ -25,7 +25,7 @@
       implicit none
 !
 !     increase MXFLD each time you add a new field
-      INTEGER, PARAMETER :: MXFLD=975
+      INTEGER, PARAMETER :: MXFLD=977
 #ifdef COMMCODE
       INTEGER, PARAMETER :: MXLVL=70 
 #else
@@ -2615,6 +2615,12 @@
       DATA IFILV(968),AVBL(968),IQ(968),IS(968),AVBLGRB2(968)      &
      &                      /1,'SEA ICE SKI TEMPERATURE ',080,001,     &
      &                       'ICETMP ON surface'/
+
+      DATA IFILV(969),AVBL(969),IQ(969),IS(969),AVBLGRB2(969)      &
+     &                      /1,'DIFFUSION M RATE S S',182,107,     &
+     &                       'TDCMOM ON isobaric_sfc'/
+
+
 
 
 !end initialization

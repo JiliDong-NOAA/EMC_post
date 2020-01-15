@@ -409,6 +409,8 @@
       deallocate(REFC_10CM)
       deallocate(REF1KM_10CM)
       deallocate(REF4KM_10CM)
+! dong
+      deallocate(TDCMOM)
 ! CRA
       deallocate(U10mean)
       deallocate(V10mean)

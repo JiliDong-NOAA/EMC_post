@@ -5678,6 +5678,14 @@
        <scale>4.0</scale>
     </param>
 
+    <param>
+       <post_avblfldidx>969</post_avblfldidx>
+       <shortname>TDCMOM_ON_ISOBARIC_SFC</shortname>
+       <pname>TDCMOM</pname>
+       <fixed_sfc1_type>isobaric_sfc</fixed_sfc1_type>
+       <scale>4.0</scale>
+    </param>
+
 
   </post_avblflds>
 </postxml>

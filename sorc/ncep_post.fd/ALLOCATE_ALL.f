@@ -212,6 +212,8 @@
       allocate(REFC_10CM(im,jsta_2l:jend_2u))
       allocate(REF1KM_10CM(im,jsta_2l:jend_2u))
       allocate(REF4KM_10CM(im,jsta_2l:jend_2u))
+! dong 
+      allocate(TDCMOM(im,jsta_2l:jend_2u,lm))
 ! CRA
       allocate(u10(im,jsta_2l:jend_2u))
       allocate(v10(im,jsta_2l:jend_2u))

@@ -43,7 +43,7 @@
               o3vdiff, o3prod, o3tndy, mwpv, unknown, vdiffzacce, zgdrag,cnvctummixing,         &
               vdiffmacce, mgdrag, cnvctvmmixing, ncnvctcfrac, cnvctumflx, cnvctdmflx,           &
               cnvctzgdrag, sconvmois, cnvctmgdrag, cnvctdetmflx, duwt, duem, dusd, dudp,        &
-              wh, qqg, ref_10cm
+              wh, qqg, ref_10cm,tdcmom
       use vrbls2d, only: f, pd, fis, pblh, ustar, z0, ths, qs, twbs, qwbs, avgcprate,           &
               cprate, avgprec, prec, lspa, sno, si, cldefi, th10, q10, tshltr, pshltr,          &
               tshltr, albase, avgalbedo, avgtcdc, czen, czmean, mxsnal, radot, sigt4,           &
@@ -1263,6 +1263,15 @@
 !       if(debugprint)print*,'sample ',VarName,'isa,jsa,l =' &
 !          ,REF_10CM(isa,jsa,l),isa,jsa,l
 !      enddo
+
+
+! dong add eddy diffusivity
+      VarName='dkudiagnostic'
+        call read_netcdf_3d_scatter(me,ncid2d,1,im,jm,jsta,jsta_2l &
+        ,jend_2u,MPI_COMM_COMP,icnt,idsp,spval,VarName &
+        ,lm,TDCMOM(1,jsta_2l,1))
+
+
 
       VarName='land' 
       call read_netcdf_2d_scatter(me,ncid2d,1,im,jm,jsta,jsta_2l &
